@@ -9,4 +9,4 @@
 # IP = env.str("ip")  # Тоже str, но для айпи адреса хоста
 
 BOT_TOKEN = '1962825445:AAFBA2ewKisVPDZNfgTnmav0X8pBll2ykQo'
-ADMINS = '112213378'
+ADMINS = ['112213378']
