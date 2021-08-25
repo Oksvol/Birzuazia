@@ -4,5 +4,5 @@ from loader import dp, bot
 
 @dp.message_handler(text='/exchange')
 async def bot_echo(message: types.Message):
-    text = message.text
-    await message.answer(f"Ты попал на вкладку 'Биржа', нажав команду {text}")
+    await message.answer(f"Биржа – это основной инструмент игры. \n"
+                         f"Здесь ты можешь покупать ценные бумаги, чтобы обогатиться и раскачать капитал. \n")

@@ -8,4 +8,4 @@ from loader import dp
 async def bot_help(message: types.Message):
     text = ("Как играть в эту дичь?")
     
-    await message.answer("\n".join(text))
+    await message.answer(text)
