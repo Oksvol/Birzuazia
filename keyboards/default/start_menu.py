@@ -2,19 +2,17 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 #Документация по текстовым кнопкам: https://core.telegram.org/bots/api#replykeyboardmarkup
 
-menu = ReplyKeyboardMarkup(
+start_menu = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="Биржа"),
+            KeyboardButton(text="Меню"),
         ],
         [
-            KeyboardButton(text="Новости компаний")
+            KeyboardButton(text="Помощь"),
+            KeyboardButton(text="Правила")
         ],
         [
-            KeyboardButton(text="Состояние счета")
-        ],
-        [
-            KeyboardButton(text="Личный кабинет")
+            KeyboardButton(text="Связаться/подписаться"),
         ],
     ],
     resize_keyboard=True
