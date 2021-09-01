@@ -4,7 +4,7 @@ from aiogram.dispatcher.filters import Text
 from aiogram.types import Message, ReplyKeyboardRemove
 from loader import dp
 
-from bot.keyboards.default import start_menu
+from keyboards.default import start_menu
 
 
 #@rate_limit(5, key="start")
