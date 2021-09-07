@@ -44,7 +44,11 @@ class Database:
         id SERIAL PRIMARY KEY,
         full_name VARCHAR(255) NOT NULL,
         username VARCHAR(255) NULL,
-        telegram_id BIGINT NOT NULL
+        telegram_id BIGINT NOT NULL UNIQUE,
+        balance FLOAT(2) NULL,
+        start_date DATE NULL,
+        last_pay DATE NULL,
+        pay_mode SMALLINT
         );
         """
         await self.execute(sql, execute=True)
@@ -57,9 +61,10 @@ class Database:
         ])
         return sql, tuple(parameters.values())
 
-    async def add_user(self, full_name, username, telegram_id):
-        sql = "INSERT INTO users (full_name, username, telegram_id) VALUES($1, $2, $3) returning *"
-        return await self.execute(sql, full_name, username, telegram_id, fetchrow=True)
+    #Пользователи
+    async def add_user(self, full_name, username, telegram_id, balance, start_date):
+        sql = "INSERT INTO Users (full_name, username, telegram_id, balance, start_date) VALUES($1, $2, $3, $4, $5) returning *"
+        return await self.execute(sql, full_name, username, telegram_id, balance, start_date, fetchrow=True)
 
     async def select_all_users(self):
         sql = "SELECT * FROM Users"
@@ -83,3 +88,15 @@ class Database:
 
     async def drop_users(self):
         await self.execute("DROP TABLE Users", execute=True)
+
+    # Акции
+    async def select_shares(self, **kwargs):
+        sql = "SELECT * FROM shares WHERE "
+        sql, parameters = self.format_args(sql, parameters=kwargs)
+        return await self.execute(sql, *parameters, fetchrow=True)
+
+    # Отрасли
+    async def select_industries(self, **kwargs):
+        sql = "SELECT * FROM industries WHERE "
+        sql, parameters = self.format_args(sql, parameters=kwargs)
+        return await self.execute(sql, *parameters, fetchrow=True)

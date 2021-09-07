@@ -1,6 +1,7 @@
 from aiogram import executor
 
 from loader import dp, db
+from utils.db_api import db_gino
 import middlewares, filters, handlers
 from utils.notify_admins import on_startup_notify
 from utils.set_bot_commands import set_default_commands
@@ -8,14 +9,18 @@ from utils.set_bot_commands import set_default_commands
 
 async def on_startup(dispatcher):
     # Создает таблицы и подключение к бд
-    await db.create()
-    await db.create_table_users()
+    print("Подключаем БД")
+    await db_gino.on_startup(dp)
+    print("Готово")
 
-    # Устанавливаем дефолтные команды
-    await set_default_commands(dispatcher)
+    print("Создаем таблицы")
+    await db.gino.create_all()
 
+    print("Готово")
     # Уведомляет про запуск
-    await on_startup_notify(dispatcher)
+    await on_startup_notify(dp)
+    # Устанавливаем дефолтные команды
+    await set_default_commands(dp)
 
 
 if __name__ == '__main__':
