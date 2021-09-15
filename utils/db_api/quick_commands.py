@@ -1,10 +1,14 @@
+from typing import List
+
 from asyncpg import UniqueViolationError
+from sqlalchemy import and_
 
 from utils.db_api.db_gino import db
 from utils.db_api.schemas.industry import Industry
 from utils.db_api.schemas.operation import Operation
 from utils.db_api.schemas.share import Share
 from utils.db_api.schemas.user import User
+
 
 #Пользователи
 async def add_user(id: int, full_name: str, username: str = None, balance: float = None):
@@ -36,10 +40,29 @@ async def update_user_username(id, username):
     await user.update(username=username).apply()
 
 
+async def update_user_balance(id, balance):
+    user = await User.get(id)
+    await user.update(username=balance).apply()
+
+
 #Отрасли
 async def select_all_industries():
     industries = await Industry.query.gino.all()
     return industries
+
+# async def get_industries() -> List[Share]:
+#     return await Share.query.distinct(Share.industry_id).gino.all()
+
+
+async def get_industries() -> List[Share]:
+
+    return await Industry.query.distinct(Industry.code).gino.all()
+
+
+async def select_industry(id: str):
+    industry = await Industry.query.where(Industry.code == id).gino.first()
+    return industry
+
 
 #Акции
 async def select_all_shares():
@@ -47,7 +70,43 @@ async def select_all_shares():
     return shares
 
 
+async def get_shares(industry) -> List[Share]:
+    shares = await Share.query.where(
+        Share.industry_id == industry
+    ).gino.all()
+    return shares
+
+
+async def get_share(tiker) -> Share:
+    share = await Share.query.where(Share.tiker == tiker).gino.first()
+    return share
+
+
+async def update_share_quantity(tiker, quantity):
+    share = await Share.get(tiker)
+    new_quantity = share.quantity + quantity
+    await share.update(quantity=new_quantity).apply()
+
+
 #Операции
 async def select_all_operations():
     operations = await Operation.query.gino.all()
     return operations
+
+
+async def add_operation(user_id: str, tiker: str, type: str, quantity: int, industry_id: str, price: float):
+    operation = Operation(user_id=user_id, tiker=tiker, type=type, quantity=quantity, industry_id=industry_id, price=price)
+    await operation.create()
+
+
+async def get_operations_of_user_by_tiker(id: str, tiker: str) -> List[Operation]:
+    user_operations = await Operation.query.where(and_(Operation.user_id == str(id),
+                                                       Operation.tiker == tiker)).gino.all()
+
+    return user_operations
+
+
+async def get_operations_of_user(id: str) -> List[Operation]:
+    user_operations = await Operation.query.where(Operation.user_id == str(id)).gino.all()
+
+    return user_operations

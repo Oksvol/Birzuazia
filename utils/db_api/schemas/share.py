@@ -13,3 +13,9 @@ class Share(BaseModel):
     quantity = Column(BigInteger)
 
     query: sql.Select
+    def __repr__(self):
+        return f"""
+        Тикер: {self.tiker}
+        Цена: {self.price}
+        ''
+        {self.description}"""
