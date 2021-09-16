@@ -5,6 +5,7 @@ from utils.db_api.db_gino import BaseModel
 
 class Share(BaseModel):
     __tablename__ = 'shares'
+    id = Column(BigInteger, primary_key=True)
     tiker = Column(String(10))
     title = Column(String(100))
     description = Column(Text)

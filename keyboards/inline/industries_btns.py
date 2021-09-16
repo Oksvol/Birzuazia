@@ -5,14 +5,14 @@ from loader import dp
 from utils.db_api.quick_commands import get_industries, get_shares, get_operations_of_user_by_tiker
 from utils.misc.count_share_balance import count_operations_by_tiker
 
-menu_cd = CallbackData('show_menu', 'level', 'industry', 'tiker', 'user')
+menu_cd = CallbackData('show_menu', 'level', 'industry', 'tiker', 'user', 'type')
 do_operation = CallbackData('deal', 'type', 'industry', 'tiker', 'user')
 
 
 
-def make_callback_data(level, industry='0', tiker='0', user=0):
+def make_callback_data(level, industry='0', tiker='0', user=0, type=0):
     return menu_cd.new(level=level,
-                       industry=industry, tiker=tiker, user=int(user))
+                       industry=industry, tiker=tiker, user=int(user), type=type)
 
 
 
@@ -72,45 +72,34 @@ async def share_keyboard(industry, tiker, user):
     CURRENT_LEVEL = 2
     markup = InlineKeyboardMarkup(row_width=2)
     balance_share = await count_operations_by_tiker(user, tiker)
-    # user_operations = await get_operations_of_user_by_tiker(user, tiker)
-    # buys = 0
-    # sells = 0
-    #
-    # for op in user_operations:
-    #     if op.type == 'buy':
-    #         buys += op.quantity
-    #     elif op.type == 'sell':
-    #         sells += op.quantity
-    #
-    # balance_share = buys - sells
 
     if balance_share > 0:
         markup.insert(
             InlineKeyboardButton(
                 text=f"Купить",
-                callback_data=do_operation.new(type='buy',
-                                               industry=industry,
+                callback_data=do_operation.new(industry=industry,
                                                tiker=tiker,
-                                               user=user))
+                                               user=user,
+                                               type='buy'))
 
         )
         markup.insert(
             InlineKeyboardButton(
                 text=f"Продать",
-                callback_data=do_operation.new(type='sell',
-                                               industry=industry,
+                callback_data=do_operation.new(industry=industry,
                                                tiker=tiker,
-                                               user=user))
+                                               user=user,
+                                               type='sell'))
 
         )
     else:
         markup.insert(
             InlineKeyboardButton(
                 text=f"Купить",
-                callback_data=do_operation.new(type='buy',
-                                               industry=industry,
+                callback_data=do_operation.new(industry=industry,
                                                tiker=tiker,
-                                               user=user))
+                                               user=user,
+                                               type='buy'))
         )
 
     markup.row(
@@ -125,16 +114,18 @@ async def share_keyboard(industry, tiker, user):
 
 
 async def buy_share(industry, tiker, user):
+    # CURRENT_LEVEL = 3
     markup = InlineKeyboardMarkup(row_width=1)
+    #
+    # markup.row(
+    #     InlineKeyboardButton(
+    #         text="Назад",
+    #         callback_data=make_callback_data(level=CURRENT_LEVEL - 1,
+    #                                          industry=industry,
+    #                                          tiker=tiker,
+    #                                          user=user))
+    # )
 
-    markup.row(
-        InlineKeyboardButton(
-            text="Назад",
-            callback_data=make_callback_data(level=2,
-                                             industry=industry,
-                                             tiker=tiker,
-                                             user=user))
-    )
 
     return markup
 

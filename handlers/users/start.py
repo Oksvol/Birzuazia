@@ -21,22 +21,22 @@ async def bot_start(message: types.Message, ):
     user = await db.select_user(id=message.from_user.id)
     count = await db.count_users()
 
-    await message.answer(
-        "\n".join(
-            [
-                f'Привет, {message.from_user.full_name}!',
-                f'Ты был занесен в базу',
-                f'В базе <b>{count}</b> пользователей\n\n',
-                f'Твой баланс: ${user.balance}\n'
-                "",
-                f"<code>User: @{user.username} - {user.full_name}</code>",
-            ]))
+    # await message.answer(
+    #     "\n".join(
+    #         [
+    #             f'Привет, {message.from_user.full_name}!',
+    #             f'Ты был занесен в базу',
+    #             f'В базе <b>{count}</b> пользователей\n\n',
+    #             f'Твой баланс: ${user.balance}\n'
+    #             "",
+    #             f"<code>User: @{user.username} - {user.full_name}</code>",
+    #         ]))
 
     await message.answer(f"Привет, {message.from_user.full_name}!\n\n" 
                          f"Добро пожаловать в страну Биржуазию, где все жители – инвесторы, а любой бизнес имеет свои акции на рынке."
                          "Цель каждого гражданина Биржуазии – наращивать капитал, поддерживая бизнес.\n\n"
-                         # "Если хочешь получше разобраться в игре нажми /help\n\n"
-                         # "В игре есть немного правил, поэтому почитай их. Для этого нажми /rules\n\n"
+                         "Если хочешь получше разобраться в игре нажми /help\n\n"
+                         "В игре есть немного правил, поэтому почитай их. Для этого нажми /rules\n\n"
                          # "Чтобы связаться с разработчиком или познакомиться с 'Забиржуазными' новостями, нажми /contacts\n\n"
                          "Приятной игры!", reply_markup=start_menu
                          )

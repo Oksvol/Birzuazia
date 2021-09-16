@@ -5,8 +5,10 @@ from aiogram.types import Message, CallbackQuery, message
 from typing import Union
 
 from aiogram.dispatcher.filters import Command, Text
+
+from keyboards.default import cancel_operation
 from keyboards.inline.industries_btns import industries_keyboard, shares_keyboard, menu_cd, share_keyboard, \
-    do_operation, buy_share
+    buy_share, do_operation
 from loader import dp
 from states.operations import Operation
 
@@ -14,6 +16,7 @@ from utils.db_api.quick_commands import select_industry, get_share, get_operatio
     add_operation, update_share_quantity
 from utils.misc.count_balance import show_balance
 from utils.misc.count_share_balance import count_operations_by_tiker
+from utils.misc.prettifying import money_format
 
 
 @dp.message_handler(Text(equals=["Биржа"]))
@@ -66,17 +69,19 @@ async def show_share(callback: CallbackQuery,industry, tiker, user):
 
     await callback.message.edit_text(text=text, reply_markup=markup)
 
-# Функция, которая предлагает продать акцию
+# Функция, которая предлагает купить акцию
 async def buy_shares(callback: CallbackQuery, industry, tiker, user):
     markup = await buy_share(industry, tiker, user)
     player = await select_user(int(user))
     share = await get_share(tiker)
     balance = await show_balance(int(user))
     allowed_quantity = int(float(balance) / share.price)
-    text = f'Напишите количество, сколько хотите купить акций компании "{share.title}" \n\n'\
-           f'<b>Ваш баланс: ${balance}</b> \n'\
-           f'<b>Цена за одну акцию: ${share.price}</b> \n\n'\
-           f'<b>Максимум вы можете купить: {allowed_quantity} шт.</b>\n\n'
+    text = f'Напиши количество, сколько хочешь купить акций компании "{share.title}" \n\n'\
+           f'<b>Твой баланс: ${await money_format(balance)}</b> \n'\
+           f'<b>Цена за одну акцию: ${await money_format(share.price)}</b> \n\n'\
+           f'<b>Максимум ты можешь купить {await money_format(allowed_quantity)} шт.</b>\n\n' \
+           f'<code>ВНИМАНИЕ! Если ты пришлешь число, будет выполнена операция. Для отмены, напиши Отмена</code>'
+
     state = dp.current_state(user=player.id)
     await callback.message.edit_text(text=text, reply_markup=markup)
     await state.update_data(player=player.id)
@@ -87,6 +92,7 @@ async def buy_shares(callback: CallbackQuery, industry, tiker, user):
     await state.update_data(industry=industry)
     await state.update_data(price=share.price)
     await Operation.quantity.set()
+
 
 @dp.message_handler(state=Operation.quantity)
 async def make_op(message: Message, state: FSMContext):
@@ -102,13 +108,17 @@ async def make_op(message: Message, state: FSMContext):
     quantity = message.text
 
 
+
     try:
         quantity = int(quantity)
     except:
-        if type == 'buy':
-            text = "Пожалуйста, введите <b>целое число</b>, сколько акций вы хотите купить"
-        if type == 'sell':
-            text = "Пожалуйста, введите <b>целое число</b>, сколько акций вы хотите продать"
+        if quantity.lower() == "Отмена".lower():
+            await state.reset_state(with_data=False)
+            await message.answer("Чтобы вернуться в начало, нажми /exchange")
+        elif type == 'buy' and quantity.lower() != "Отмена".lower():
+            text = "Пожалуйста, введи <b>целое число</b>, сколько акций ты хочешь купить"
+        elif type == 'sell' and quantity.lower() != "Отмена".lower():
+            text = "Пожалуйста, введи <b>целое число</b>, сколько акций ты хочешь продать"
 
     if isinstance(quantity, int):
         if type == 'buy':
@@ -117,21 +127,20 @@ async def make_op(message: Message, state: FSMContext):
                 await update_share_quantity(tiker, quantity)
                 player_balance = await show_balance(user)
 
-                text = f'Отлично! Вы купили {quantity} акций компании "{share_title}" \n\n' \
-                       f'Теперь ваш баланс: ${player_balance} \n ' \
-                       f'Чтобы продолжить покупки, нажите /exchange'
+                text = f'Отлично! У тебя теперь +{await money_format(quantity)} акций компании "{share_title}" \n\n' \
+                       f'Теперь твой баланс: ${await money_format(player_balance)} \n ' \
+                       f'Чтобы продолжить покупки, нажми /exchange'
                 await state.finish()
             else:
-                text = f"Это больше, чем вы можете себе позволить. Максимальное количество, которое вы можете купить – {allowed_quantity} шт."
-
+                text = f"Это больше, чем ты можешь себе позволить. Максимальное количество, которое ты можешь купить – {allowed_quantity} шт."
 
         else:
             if quantity <= allowed_quantity:
                 await add_operation(str(user), tiker, type, quantity, industry, price)
                 await update_share_quantity(tiker, quantity)
                 player_balance = await show_balance(user)
-                text = f'Отлично! Вы продали {quantity} акций компании "{share_title}" \n\n' \
-                       f'Теперь ваш баланс: ${player_balance} \n ' \
+                text = f'Отлично! Вы продали {await money_format(quantity)} акций компании "{share_title}" \n\n' \
+                       f'Теперь ваш баланс: ${await money_format(player_balance)} \n ' \
                        f'Чтобы продолжить совершать сделки, нажите /exchange'
                 await state.finish()
             else:
@@ -145,10 +154,11 @@ async def sell_shares(callback: CallbackQuery, industry, tiker, user):
     player = await select_user(int(user))
     share = await get_share(tiker)
     balance_share = await count_operations_by_tiker(user, tiker)
-    text = f'Напишите количество, сколько хотите продать акций компании "{share.title}" \n\n'\
-           f'<b>Ваш баланс: ${player.balance}</b> \n'\
-           f'<b>Цена за одну акцию: ${share.price}</b> \n\n'\
-           f'<b>Всего таких акций у вас в портфеле: {balance_share} шт.</b>\n\n'
+    text = f'Напиши количество, сколько хочешь продать акций компании "{share.title}" \n\n'\
+           f'<b>Твой баланс: ${await money_format(player.balance)}</b> \n'\
+           f'<b>Цена за одну акцию: ${await money_format(share.price)}</b> \n\n'\
+           f'<b>Всего таких акций у тебя в портфеле: {await money_format(balance_share)} шт.</b>\n\n' \
+           f'<code>ВНИМАНИЕ! Если ты пришлешь число, будет выполнена операция. Для отмены, напиши Отмена</code>'
 
     state = dp.current_state(user=player.id)
     await callback.message.edit_text(text=text, reply_markup=markup)
@@ -160,7 +170,6 @@ async def sell_shares(callback: CallbackQuery, industry, tiker, user):
     await state.update_data(industry=industry)
     await state.update_data(price=share.price)
     await Operation.quantity.set()
-
 
 
 @dp.callback_query_handler(menu_cd.filter())
@@ -176,7 +185,6 @@ async def navigate(call: CallbackQuery, callback_data: dict):
         "0": list_industries,
         '1': list_shares,
         '2': show_share
-
     }
 
     current_level_function = levels[current_level]
@@ -190,18 +198,19 @@ async def navigate(call: CallbackQuery, callback_data: dict):
     industry = callback_data.get('industry')
     tiker = callback_data.get('tiker')
     user = callback_data.get('user')
-    #balance_share = callback_data.get('balance_share')
     logging.info(f"{callback_data=}")
     await call.answer(cache_time=60)
 
     types = {
         "buy": buy_shares,
-        "sell": sell_shares
+        "sell": sell_shares,
+        "back": show_share
     }
 
     type_function = types[type]
 
     await type_function(call, industry=industry, tiker=tiker, user=user)
+
 
 
 

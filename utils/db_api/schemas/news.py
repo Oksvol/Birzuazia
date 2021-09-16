@@ -1,4 +1,4 @@
-from sqlalchemy import Column, BigInteger, String, sql, Numeric, DateTime, Text
+from sqlalchemy import Text, Column, BigInteger, String, sql
 
 from utils.db_api.db_gino import TimedBaseModel
 
@@ -8,7 +8,6 @@ class News(TimedBaseModel):
     id = Column(BigInteger, primary_key=True)
     tiker = Column(String(10))
     type = Column(String(25))
-    industry_id = Column(String(100))
-    text = Column(Text())
+    text = Column(Text)
 
     query: sql.Select

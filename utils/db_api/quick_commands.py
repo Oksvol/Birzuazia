@@ -8,7 +8,7 @@ from utils.db_api.schemas.industry import Industry
 from utils.db_api.schemas.operation import Operation
 from utils.db_api.schemas.share import Share
 from utils.db_api.schemas.user import User
-
+from utils.db_api.schemas.news import News
 
 #Пользователи
 async def add_user(id: int, full_name: str, username: str = None, balance: float = None):
@@ -83,9 +83,10 @@ async def get_share(tiker) -> Share:
 
 
 async def update_share_quantity(tiker, quantity):
-    share = await Share.get(tiker)
+    share = await get_share(tiker)
     new_quantity = share.quantity + quantity
     await share.update(quantity=new_quantity).apply()
+
 
 
 #Операции

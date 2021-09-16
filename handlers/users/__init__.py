@@ -1,14 +1,14 @@
 from . import help
-from . import form
+#from . import form
 from . import menu
 #from . import menu_handlers
-from . import inline
-from . import update_db
+#from . import inline
+#from . import update_db
 from . import start
 from . import exchange
 from . import portfel
 from . import news
-from . import lk
+#from . import lk
 from . import admin
 from . import testing
 from . import purchase
@@ -17,4 +17,4 @@ from . import contacts
 
 
 
-from . import echo
+#from . import echo

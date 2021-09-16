@@ -8,8 +8,9 @@ async def set_default_commands(dp):
             types.BotCommand("menu", "Меню бота"),
             types.BotCommand("exchange", "Биржа"),
             types.BotCommand("portfel", "Посмотреть портфель"),
-            types.BotCommand("lk", "Личный кабинет"),
+            #types.BotCommand("lk", "Личный кабинет"),
             types.BotCommand("news", "Последние новости"),
+            types.BotCommand("rules", "Правила игры"),
             types.BotCommand("help", "Как играть?"),
         ]
     )
