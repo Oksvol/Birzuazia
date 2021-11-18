@@ -16,7 +16,7 @@ async def bot_start(message: types.Message, ):
     await db.add_user(id=message.from_user.id,
                      full_name=message.from_user.full_name,
                      username=message.from_user.username,
-                     balance=10000000)
+                     balance=350000)
 
     user = await db.select_user(id=message.from_user.id)
     count = await db.count_users()

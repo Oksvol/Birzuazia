@@ -3,3 +3,4 @@ from . import logging
 from . import count_balance
 from . import count_share_balance
 from . import prettifying
+from . import random_price

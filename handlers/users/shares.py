@@ -1,30 +1,30 @@
 import logging
-from aiogram.dispatcher import FSMContext
-from aiogram.types import Message, CallbackQuery, message
-
 from typing import Union
 
+from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Command, Text
+from aiogram.types import Message, CallbackQuery
 
 from handlers.users.news import bot_news
 from handlers.users.portfel import bot_portfel
 from handlers.users.start import bot_start
+from keyboards.inline.exchange_btns import exchange_menu
+
 from keyboards.inline.industries_btns import industries_keyboard, shares_keyboard, menu_cd, share_keyboard, \
     buy_share, do_operation
 from loader import dp
 from states.operations import Operation
-
 from utils.db_api.quick_commands import select_industry, get_share, select_user, \
     add_operation, update_share_quantity
 from utils.misc.count_balance import show_balance
 from utils.misc.count_share_balance import count_operations_by_tiker
 from utils.misc.prettifying import money_format
-from utils.misc.random_price import rand_prices
 
 
-@dp.message_handler(Text(equals=["Биржа"]))
-@dp.message_handler(Command('exchange'))
-async def bot_exchange(message: Message):
+@dp.callback_query_handler(text="акции")
+@dp.message_handler(Text(equals=["Акции"]))
+@dp.message_handler(Command('shares'))
+async def shares_menu(message: Message):
     # Выполним функцию, которая отправит пользователю кнопки с доступными категориями
     await list_industries(message)
 
@@ -39,12 +39,9 @@ async def list_industries(message: Union[Message, CallbackQuery], **kwargs):
 
     # Проверяем, что за тип апдейта. Если Message - отправляем новое сообщение
     if isinstance(message, Message):
-        await message.answer(f"Загружаю данные биржи...")
-        await rand_prices()
-
-        await message.answer(f"Биржа – это основной инструмент игры. \n"
-                             f"Здесь ты можешь покупать ценные бумаги, чтобы обогатиться и раскачать капитал. \n\n"
-                             f"Все компании поделены по отраслям. \n\n"
+        await message.answer(f"Акции – высокодоходный инструмент на бирже. \n"
+                             f"А где высокий доход, там и риск. Поскольку акции – это прямое отражение отношения инвесторов к компании, их цена может менять на несколько десятков процентов за короткий срок. \n\n"
+                             f"Поэтому к этому инструменту нужно относиться с умом и осторожностью. \n\n"
                              f"Выбирай отрасль и внутри будет список компаний. Купить можно сколько угодно, но не больше, чем позволяет твой капитал.\n\n"
                              f"Если у тебя уже есть акции компании, то их можно продать по текущей цене.", reply_markup=markup)
 
@@ -52,7 +49,13 @@ async def list_industries(message: Union[Message, CallbackQuery], **kwargs):
     # Если CallbackQuery - изменяем это сообщение
     elif isinstance(message, CallbackQuery):
         call = message
+        await call.message.edit_text(f"Акции – высокодоходный инструмент на бирже. \n"
+                                     f"А где высокий доход, там и риск. Поскольку акции – это прямое отражение отношения инвесторов к компании, их цена может менять на несколько десятков процентов за короткий срок. \n\n"
+                                     f"Поэтому к этому инструменту нужно относиться с умом и осторожностью. \n\n"
+                                     f"Выбирай отрасль и внутри будет список компаний. Купить можно сколько угодно, но не больше, чем позволяет твой капитал.\n\n"
+                                     f"Если у тебя уже есть акции компании, то их можно продать по текущей цене.")
         await call.message.edit_reply_markup(markup)
+
 
 async def list_shares(callback: CallbackQuery, industry, user, **kwargs):
 

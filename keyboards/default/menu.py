@@ -12,10 +12,7 @@ menu = ReplyKeyboardMarkup(
         ],
         [
             KeyboardButton(text="Состояние счета")
-        ],
-        [
-            KeyboardButton(text="Личный кабинет")
-        ],
+        ]
     ],
     resize_keyboard=True
 )

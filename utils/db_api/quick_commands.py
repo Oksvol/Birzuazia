@@ -88,6 +88,11 @@ async def update_share_quantity(tiker, quantity):
     await share.update(quantity=new_quantity).apply()
 
 
+async def update_share_price(tiker, price):
+    share = await get_share(tiker)
+    await share.update(price=price).apply()
+
+
 
 #Операции
 async def select_all_operations():
