@@ -84,7 +84,7 @@ async def buy_shares(callback: CallbackQuery, industry, tiker, user):
     balance = await show_balance(int(user))
     allowed_quantity = int(float(balance) / float(share.price))
     text = f'Напиши количество, сколько хочешь купить акций компании "{share.title}" \n\n'\
-           f'<b>Твой баланс: ${await money_format(balance)}</b> \n'\
+           f'<b>Денег в твоем кошельке: ${await money_format(balance)}</b> \n'\
            f'<b>Цена за одну акцию: ${await money_format(share.price)}</b> \n\n'\
            f'<b>Максимум ты можешь купить {await money_format(allowed_quantity)} шт.</b>\n\n' \
            f'<code>ВНИМАНИЕ! Если ты пришлешь число, будет выполнена операция. Для отмены, напиши Отмена</code>'
@@ -119,13 +119,13 @@ async def make_op(message: Message, state: FSMContext):
     try:
         quantity = int(quantity)
     except:
-        if quantity.lower() == "Отмена".lower():
+        if quantity.lower() == "Отмена".lower() or quantity.lower() == "Биржа".lower() or quantity.lower() == "/exchange".lower():
             await state.reset_state(with_data=False)
             await bot_exchange(message)
-        elif quantity.lower() == "/news".lower():
+        elif quantity.lower() == "/news".lower() or quantity.lower() == "Новости компаний".lower():
             await state.reset_state(with_data=False)
             await bot_news(message)
-        elif quantity.lower() == "/portfel".lower():
+        elif quantity.lower() == "/portfel".lower() or quantity.lower() == "Состояние счета".lower():
             await state.reset_state(with_data=False)
             await bot_portfel(message)
         elif quantity.lower() == "/start".lower():
@@ -138,29 +138,37 @@ async def make_op(message: Message, state: FSMContext):
 
     if isinstance(quantity, int):
         if type == 'buy':
-            if quantity <= allowed_quantity:
+            if quantity <= allowed_quantity and quantity > 0:
                 await add_operation(str(user), tiker, type, quantity, industry, price)
                 await update_share_quantity(tiker, quantity)
                 player_balance = await show_balance(user)
 
                 text = f'Отлично! У тебя теперь +{await money_format(quantity)} акций компании "{share_title}" \n\n' \
-                       f'Теперь твой баланс: ${await money_format(player_balance)} \n ' \
+                       f'Осталось денег: ${await money_format(player_balance)} \n ' \
                        f'Чтобы продолжить покупки, нажми /exchange'
                 await state.finish()
+            elif quantity == 0:
+                text = f'0 акций? Урааааа! У нас тут операция на 0 акций) Давай хотя бы одну?'
+            elif quantity < 0:
+                text = f'Мы тут на позитиве, так что нужны положительные числа)'
             else:
                 text = f"Это больше, чем ты можешь себе позволить. Максимальное количество, которое ты можешь купить – {allowed_quantity} шт."
 
         else:
-            if quantity <= allowed_quantity:
+            if quantity <= allowed_quantity and quantity > 0:
                 await add_operation(str(user), tiker, type, quantity, industry, price)
                 await update_share_quantity(tiker, quantity)
                 player_balance = await show_balance(user)
-                text = f'Отлично! Вы продали {await money_format(quantity)} акций компании "{share_title}" \n\n' \
-                       f'Теперь ваш баланс: ${await money_format(player_balance)} \n ' \
-                       f'Чтобы продолжить совершать сделки, нажите /exchange'
+                text = f'Отлично! Ты продал {await money_format(quantity)} акций компании "{share_title}" \n\n' \
+                       f'Осталось денег: ${await money_format(player_balance)} \n ' \
+                       f'Чтобы продолжить совершать сделки, нажми /exchange'
                 await state.finish()
+            elif quantity == 0:
+                text = f'0 акций? Урааааа! У нас тут операция на 0 акций) Давай хотя бы одну?'
+            elif quantity < 0:
+                text = f'Мы тут на позитиве, так что нужны положительные числа)'
             else:
-                text = f"У вас нет столько акций. Максимальное количество, которое вы можете продать – {allowed_quantity} шт."
+                text = f"У тебя нет столько акций. Максимальное количество, которое ты можешь продать – {allowed_quantity} шт."
 
     await message.answer(text=text)
 
@@ -169,9 +177,10 @@ async def sell_shares(callback: CallbackQuery, industry, tiker, user):
     markup = await buy_share(industry, tiker, user)
     player = await select_user(int(user))
     share = await get_share(tiker)
+    balance = await show_balance(int(user))
     balance_share = await count_operations_by_tiker(user, tiker)
     text = f'Напиши количество, сколько хочешь продать акций компании "{share.title}" \n\n'\
-           f'<b>Твой баланс: ${await money_format(player.balance)}</b> \n'\
+           f'<b>У тебя есть в кошельке ${await money_format(balance)}</b> \n'\
            f'<b>Цена за одну акцию: ${await money_format(share.price)}</b> \n\n'\
            f'<b>Всего таких акций у тебя в портфеле: {await money_format(balance_share)} шт.</b>\n\n' \
            f'<code>ВНИМАНИЕ! Если ты пришлешь число, будет выполнена операция. Для отмены, напиши Отмена</code>'

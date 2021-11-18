@@ -1,6 +1,6 @@
 from utils.db_api.quick_commands import select_user, get_operations_of_user, get_share
 from utils.misc.count_share_balance import count_operations_by_tiker
-from utils.misc.prettifying import money_format
+from utils.misc.prettifying import money_format, grades_format
 
 
 async def show_balance(user):
@@ -41,14 +41,15 @@ async def show_user_portfel(user):
         # asset = (tiker, quantity, sum)
         # portfel.append(asset)
         # portfel.append('\n')
-        portfel.append('<b>')
-        portfel.append(tiker)
-        portfel.append('</b>')
-        portfel.append(" : ")
-        portfel.append(await money_format(quantity))
-        portfel.append(" шт. :  $")
-        portfel.append(await money_format(sum))
-        portfel.append("\n")
+        if quantity > 0:
+            portfel.append('<b>')
+            portfel.append(tiker)
+            portfel.append('</b>')
+            portfel.append(" : ")
+            portfel.append(await grades_format(quantity))
+            portfel.append(" шт. :  $")
+            portfel.append(await money_format(sum))
+            portfel.append("\n")
 
     return portfel
 
