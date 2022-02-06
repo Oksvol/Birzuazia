@@ -7,7 +7,10 @@ async def rand_prices():
     shares = await select_all_shares()
     for share in shares:
         price = int(share.price)
-        share_price = random.uniform(price-(price/100*2), price+(price/100*2))
+        if price < 5:
+            share_price = random.uniform(price + (price / 100 * 1), price + (price / 100 * 2))
+        else:
+            share_price = random.uniform(price - (price / 100 * 2), price + (price / 100 * 2))
         await update_share_price(share.tiker, share_price)
 
     return

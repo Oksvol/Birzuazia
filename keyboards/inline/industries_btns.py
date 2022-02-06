@@ -43,7 +43,7 @@ async def shares_keyboard(industry, user):
     shares = await get_shares(industry)
 
     for share in shares:
-        button_text = f'{share.tiker} - {share.title} - ${share.price}'
+        button_text = f'{share.title} - {share.tiker} - ${share.price}'
         callback_data = make_callback_data(level=CURRENT_LEVEL + 1,
                                            industry=industry,
                                            tiker=share.tiker,

@@ -18,7 +18,7 @@ from utils.db_api.quick_commands import select_industry, get_share, select_user,
     add_operation, update_share_quantity
 from utils.misc.count_balance import show_balance
 from utils.misc.count_share_balance import count_operations_by_tiker
-from utils.misc.prettifying import money_format
+from utils.misc.prettifying import money_format, grades_format
 from utils.misc.random_price import rand_prices
 
 
@@ -86,7 +86,7 @@ async def buy_shares(callback: CallbackQuery, industry, tiker, user):
     text = f'Напиши количество, сколько хочешь купить акций компании "{share.title}" \n\n'\
            f'<b>Денег в твоем кошельке: ${await money_format(balance)}</b> \n'\
            f'<b>Цена за одну акцию: ${await money_format(share.price)}</b> \n\n'\
-           f'<b>Максимум ты можешь купить {await money_format(allowed_quantity)} шт.</b>\n\n' \
+           f'<b>Максимум ты можешь купить {await grades_format(allowed_quantity)} шт.</b>\n\n' \
            f'<code>ВНИМАНИЕ! Если ты пришлешь число, будет выполнена операция. Для отмены, напиши Отмена</code>'
 
     state = dp.current_state(user=player.id)
@@ -143,7 +143,7 @@ async def make_op(message: Message, state: FSMContext):
                 await update_share_quantity(tiker, quantity)
                 player_balance = await show_balance(user)
 
-                text = f'Отлично! У тебя теперь +{await money_format(quantity)} акций компании "{share_title}" \n\n' \
+                text = f'Отлично! +{await grades_format(quantity)} акций компании "{share_title}" в твоем портфеле! \n\n' \
                        f'Осталось денег: ${await money_format(player_balance)} \n ' \
                        f'Чтобы продолжить покупки, нажми /exchange'
                 await state.finish()
@@ -159,7 +159,7 @@ async def make_op(message: Message, state: FSMContext):
                 await add_operation(str(user), tiker, type, quantity, industry, price)
                 await update_share_quantity(tiker, quantity)
                 player_balance = await show_balance(user)
-                text = f'Отлично! Ты продал {await money_format(quantity)} акций компании "{share_title}" \n\n' \
+                text = f'Отлично! Ты продал {await grades_format(quantity)} акций компании "{share_title}" \n\n' \
                        f'Осталось денег: ${await money_format(player_balance)} \n ' \
                        f'Чтобы продолжить совершать сделки, нажми /exchange'
                 await state.finish()
@@ -182,7 +182,7 @@ async def sell_shares(callback: CallbackQuery, industry, tiker, user):
     text = f'Напиши количество, сколько хочешь продать акций компании "{share.title}" \n\n'\
            f'<b>У тебя есть в кошельке ${await money_format(balance)}</b> \n'\
            f'<b>Цена за одну акцию: ${await money_format(share.price)}</b> \n\n'\
-           f'<b>Всего таких акций у тебя в портфеле: {await money_format(balance_share)} шт.</b>\n\n' \
+           f'<b>Всего таких акций у тебя в портфеле: {await grades_format(balance_share)} шт.</b>\n\n' \
            f'<code>ВНИМАНИЕ! Если ты пришлешь число, будет выполнена операция. Для отмены, напиши Отмена</code>'
 
     state = dp.current_state(user=player.id)

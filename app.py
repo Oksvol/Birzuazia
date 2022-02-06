@@ -1,6 +1,7 @@
 from aiogram import executor
 
-from loader import dp, db
+from handlers.users.mail import schedule_jobs
+from loader import dp, db, scheduler
 from utils.db_api import db_gino
 import middlewares, filters, handlers
 from utils.notify_admins import on_startup_notify
@@ -16,6 +17,9 @@ async def on_startup(dispatcher):
     print("Создаем таблицы")
     await db.gino.create_all()
 
+    #запускаем отложенные функцию
+    schedule_jobs()
+
     print("Готово")
     # Уведомляет про запуск
     await on_startup_notify(dp)
@@ -23,6 +27,8 @@ async def on_startup(dispatcher):
     await set_default_commands(dp)
 
 
+
 if __name__ == '__main__':
+    scheduler.start()
     executor.start_polling(dp, on_startup=on_startup)
 

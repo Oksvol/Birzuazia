@@ -1,23 +1,16 @@
+from loader import dp, scheduler
+from data.config import ADMINS
 import logging
 
-from aiogram import Dispatcher
-from aiogram.dispatcher.filters import Command
-from loader import dp
 
-from data.config import ADMINS
-from utils.db_api.quick_commands import select_all_users
-
-
-@dp.message_handler(Command('mail'))
-async def on_startup_notify(dp: Dispatcher):
-    users = await select_all_users()
-    user_ids = []
-    for user in users:
-        user_ids.append(user.id)
-
-    for user in user_ids:
+async def scheduled_messages():
+    for admin in ADMINS:
         try:
-            await dp.bot.send_message(user, "Privyau! Это тестовая рассылка, а заодно и небольшое сообщение) Все операции будут удалены, активы из ваших портфелей пропадут и состояние счетов вернется в базовое состояние) Готовим бота к второму этапу. Не скучайте;)")
+            await dp.bot.send_message(admin, "Привет! Это тестовое сообщение")
 
         except Exception as err:
             logging.exception(err)
+
+def schedule_jobs():
+    scheduler.add_job(scheduled_messages, "cron", day="*", hour="15", minute="00")
+

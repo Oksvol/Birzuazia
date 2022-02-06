@@ -5,3 +5,4 @@ environs~=8.0.0
 asyncpg
 datetime
 aiogram_broadcaster
+apscheduler

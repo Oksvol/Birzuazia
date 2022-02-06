@@ -5,6 +5,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Command, Text
 from aiogram.types import Message, CallbackQuery
 
+from handlers.users.exchange import bot_exchange
 from handlers.users.news import bot_news
 from handlers.users.portfel import bot_portfel
 from handlers.users.start import bot_start

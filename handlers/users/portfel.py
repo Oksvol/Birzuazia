@@ -26,8 +26,10 @@ async def bot_portfel(message: types.Message):
 
     if profit > 0:
         profit_info = '<b>Прибыль за весь период: </b>' + "🟢 " + str(profit) + '% \n\n'
-    elif profit <= 0:
+    elif profit < 0:
         profit_info = '<b>Прибыль за весь период: </b>' + "🔴 " + str(profit) + '% \n\n'
+    elif profit == 0:
+        profit_info = '<b>Прибыль за весь период: </b>' + "⚪️ " + str(profit) + '% \n\n'
 
     text = f'<b>Баланс:</b> ${await money_format(total_sum_portfel)} \n\n' \
            f'<b>Сумма активов:</b> ${await money_format(sum_assets)} \n\n' \

@@ -1,3 +1,4 @@
+from datetime import date, datetime
 from typing import List
 
 from asyncpg import UniqueViolationError
@@ -8,7 +9,8 @@ from utils.db_api.schemas.industry import Industry
 from utils.db_api.schemas.operation import Operation
 from utils.db_api.schemas.share import Share
 from utils.db_api.schemas.user import User
-from utils.db_api.schemas.news import News
+from utils.db_api.schemas.news_global import News_Global
+from utils.db_api.schemas.news_exchange import News_Exchange
 
 #Пользователи
 async def add_user(id: int, full_name: str, username: str = None, balance: float = None):
@@ -116,3 +118,26 @@ async def get_operations_of_user(id: str) -> List[Operation]:
     user_operations = await Operation.query.where(Operation.user_id == str(id)).gino.all()
 
     return user_operations
+
+
+#Глобальные новости
+async def select_all_news_global():
+    news_global = await News_Global.query.gino.all()
+    return news_global
+
+
+async def select_news_global_by_date(dt):
+    news_global_from_date = await News_Global.query.where((News_Global.public_date == dt)).gino.all()
+    return news_global_from_date
+
+#Новости биржи
+async def select_all_news_exchange():
+    news_exchange = await News_Exchange.query.gino.all()
+    return news_exchange
+
+
+async def select_news_exchange_by_date(dt):
+    news_exchange_from_date = await News_Exchange.query.where((News_Exchange.public_date == dt)).gino.all()
+    return news_exchange_from_date
+
+
