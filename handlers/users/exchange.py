@@ -144,7 +144,8 @@ async def make_op(message: Message, state: FSMContext):
                 player_balance = await show_balance(user)
 
                 text = f'Отлично! +{await grades_format(quantity)} акций компании "{share_title}" в твоем портфеле! \n\n' \
-                       f'Осталось денег: ${await money_format(player_balance)} \n ' \
+                       f'Осталось денег: ${await money_format(player_balance)} \n\n ' \
+                       f'Теперь жди новостей на рынке) \n\n ' \
                        f'Чтобы продолжить покупки, нажми /exchange'
                 await state.finish()
             elif quantity == 0:
