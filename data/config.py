@@ -7,9 +7,6 @@ BOT_TOKEN = env('BOT_TOKEN')  # Забираем значение типа str
 ADMINS = env.list('ADMINS')  # Тут у нас будет список из админов
 IP = env.str("ip")  # Тоже str, но для айпи адреса хоста
 
-
-banned_users = [2134876231, 237492138764]
-
 allowed_users = []
 
 DB_USER = env.str("DB_USER")

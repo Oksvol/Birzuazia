@@ -42,7 +42,7 @@ async def exchange_news_list_and_change_price(dt):
     for n in exchange_news:
         tiker = n.tiker
         share = await get_share(tiker)
-        price = share.price / 100 * n.change
+        price = share.price + (share.price * n.change) # обновить цену с учетом изменения цены
         await update_share_price(tiker, price)
 
     news_list = await exchange_news_list(dt)

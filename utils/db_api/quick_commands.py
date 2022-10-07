@@ -120,6 +120,7 @@ async def get_operations_of_user(id: str) -> List[Operation]:
     return user_operations
 
 
+
 #Глобальные новости
 async def select_all_news_global():
     news_global = await News_Global.query.gino.all()

@@ -11,4 +11,4 @@ storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 scheduler = AsyncIOScheduler()
 
-__all__ = ["bot", "storage", "dp", "db"]
+__all__ = ["bot", "storage", "dp", "db", "scheduler"]

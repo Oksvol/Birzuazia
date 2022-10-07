@@ -11,6 +11,5 @@ async def scheduled_messages():
         except Exception as err:
             logging.exception(err)
 
-def schedule_jobs():
-    scheduler.add_job(scheduled_messages, "cron", day="*", hour="15", minute="00")
+
 
